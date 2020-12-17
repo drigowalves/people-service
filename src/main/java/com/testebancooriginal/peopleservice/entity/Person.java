@@ -1,5 +1,6 @@
 package com.testebancooriginal.peopleservice.entity;
 
+import com.testebancooriginal.peopleservice.data.request.PersonRequest;
 import com.testebancooriginal.peopleservice.data.response.PersonResponse;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -32,6 +33,16 @@ public class Person {
                 .name(name)
                 .surname(surname)
                 .build();
+    }
+
+    public PersonRequest toPersonRequest() {
+        return PersonRequest
+            .builder()
+            .age(age)
+            .cpf(cpf)
+            .name(name)
+            .surname(surname)
+            .build();
     }
 
 }

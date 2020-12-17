@@ -7,6 +7,7 @@ import static java.util.Optional.*;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -93,10 +94,55 @@ class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowNotFoundException_WhenPersonIdNotFound() {
+    public void shouldThrowNotFoundException_WhenTryPersonIdNotFound() {
         Person person = getPerson();
         given(personRepository.findById(eq(person.getId()))).willReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> personService.findById(person.getId()));
+    }
+
+    @Test
+    public void shouldUpdateAPerson() {
+        Person person = getPerson();
+        Address address = getAddress();
+        given(personRepository.findById(eq(person.getId()))).willReturn(of(person));
+        given(personRepository.save(any(Person.class)))
+            .willReturn(person.withAge(29));
+
+        PersonResponse personResponse = personService
+            .update(person.getId(), person.withAge(29).toPersonRequest());
+
+        assertThat(personResponse.getId()).isNotBlank().isEqualTo(person.getId());
+        assertThat(personResponse.getName()).isNotBlank().isEqualTo(person.getName());
+        assertThat(personResponse.getSurname()).isNotBlank().isEqualTo(person.getSurname());
+        assertThat(personResponse.getAge()).isNotNull().isNotEqualTo(person.getAge());
+        assertThat(personResponse.getCpf()).isNotBlank().isEqualTo(person.getCpf());
+    }
+
+    @Test
+    public void shouldThrowNotFound_WhenTryUpdateAPerson() {
+        Person person = getPerson();
+        given(personRepository.findById(eq(person.getId()))).willReturn(empty());
+        assertThrows(NotFoundException.class, () -> personService.update(person.getId(), person.toPersonRequest()));
+    }
+
+    @Test
+    public void shouldDeleteAPerson() {
+        Person person = getPerson();
+        given(personRepository.save(any(Person.class)))
+            .willReturn(person);
+        PersonResponse personResponse = personService.create(person.toPersonRequest());
+        given(personRepository.findById(eq(personResponse.getId()))).willReturn(of(person));
+        assertDoesNotThrow(() -> personService.delete(personResponse.getId()));
+    }
+
+    @Test
+    public void shouldThrowNotFound_WhenTryDeleteAPerson() {
+        Person person = getPerson();
+        given(personRepository.save(any(Person.class)))
+            .willReturn(person);
+        PersonResponse personResponse = personService.create(person.toPersonRequest());
+        given(personRepository.findById(eq(personResponse.getId()))).willReturn(empty());
+        assertThrows(NotFoundException.class, () -> personService.delete(personResponse.getId()));
     }
 
 }
