@@ -1,5 +1,7 @@
 package com.testebancooriginal.peopleservice.client;
 
+import static java.lang.String.*;
+
 import com.testebancooriginal.peopleservice.client.response.AddressResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,7 @@ public class AddressWebClient {
     public AddressResponse getAddressByZipCode(String zipCode) {
         return addressRestWebClient
             .get()
-            .uri(String.format("%s/json/", zipCode))
+            .uri(format("%s/json/", zipCode))
             .retrieve()
             .bodyToMono(AddressResponse.class)
             .block();

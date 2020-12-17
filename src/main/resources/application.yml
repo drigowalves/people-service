@@ -4,3 +4,8 @@ server:
 spring:
   application:
     name: crud
+
+services:
+  viacep:
+    url-base: viacep.com.br/ws/
+
